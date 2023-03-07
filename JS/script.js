@@ -103,40 +103,47 @@ function initMap() {
 
 // Call initMap on document ready
 $(document).ready(function () {
-    initMap();
-    // if ("geolocation" in navigator) {
-    //     navigator.geolocation.getCurrentPosition(function (position) {
-    //         var lat = position.coords.latitude;
-    //         var lng = position.coords.longitude;
-    //         $.ajax({
-    //             url: "PhP/countryCode.php",
-    //             data: {
-    //                 lat: lat,
-    //                 lng: lng
-    //             },
-    //             success: function (result) {
-    //                 $("#iso-country").val(result.data.countryCode).change();
-    //                 map = L.map('mapid').setView([lat, lng], 13);
-    //                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //                     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-    //                         '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    //                         'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    //                     maxZoom: 18,
-    //                 }).addTo(map);
-    //                 L.marker([lat, lng]).addTo(map);
-    //             }
-    //         });
-    //     });
-    // } else {
-    //     map = L.map('mapid').setView([51.505, -0.09], 13);
-    //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-    //             '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    //             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    //         maxZoom: 18,
-    //     }).addTo(map);
-    //     easyButton([51.505, -0.09], map);
-    // }
+    //  initMap();
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            $.ajax({
+                url: "PhP/countryCode.php",
+                dataType: 'json',
+                data: {
+                    latitude: lat,
+                    longitude: lng
+                },
+                success: function (result_code) {
+                    console.log(result_code)
+                    $("#iso-country").val(result_code.data.countryCode).change();
+                    map = L.map('map').setView([lat, lng], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        maxZoom: 18,
+                    }).addTo(map);
+                    L.marker([lat, lng]).addTo(map);
+                },
+                error: function (error) {
+
+                    console.log(error);
+
+                }
+            });
+        });
+    } else {
+        map = L.map('mapid').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            maxZoom: 18,
+        }).addTo(map);
+        easyButton([51.505, -0.09], map);
+    }
 
 
     easyButton();
