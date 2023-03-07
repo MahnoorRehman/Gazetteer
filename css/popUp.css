@@ -1,0 +1,51 @@
+.my-popup a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #337ab7;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.my-popup a,
+.my-popup a:visited {
+    color: #fff;
+}
+
+.my-popup a:hover {
+    background-color: #23527c;
+    color: #fff;
+}
+
+/* Define CSS rules for the popup container */
+/* .my-popup {
+    max-width: 300px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+} */
+
+/* Define CSS rules for the popup content */
+.my-popup h2 {
+    font-size: 20px;
+    margin: 0 0 10px;
+}
+
+.my-popup img {
+    max-width: 300px;
+    height: 150px;
+    display: block;
+    margin: 0 auto;
+}
+
+.my-popup p {
+    font-size: 14px;
+    margin: 0;
+    text-decoration: none;
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/popUp.css">
+
+
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- marker Clusterk -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css">
+
+
+    <!-- BootStrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+    <script src="JS/jquery-2.2.3.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+    <title>GAZETTEER</title>
+</head>
+
+<body>
+    <div class="main">
+        <div class="preloader-container">
+            <img src="images/map.gif" alt="Loading...">
+        </div>
+        <div id="map" class="real-data-container leaflet-map leaflet-container"></div>
+        <!-- countrylist -->
+        <div class="dropdown country-dropdown">
+            <select name="country" id="iso-country">
+                <option id="option">Counrty</option>
+            </select>
+
+        </div>
+    </div>
+
+    <!-- Country Info Modal -->
+    <div class="modal fade show" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="name">Country </h2>
+                    <img id="flag" class='country-flag' src=""
+                        style="width: 90px; height: 60px; display: block; margin: auto;" />
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class=" table table-striped ">
+
+                        <tbody>
+                            <tr class="tr-border">
+                                <th scope="col">Capital</th>
+                                <td id="txtcapital"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Population</th>
+                                <td id="txtpopulation"></td>
+                            </tr>
+                            <tr>
+                                <th scope="col">Area</th>
+                                <td id="txtarea"></td>
+                            </tr>
+                            <tr>
+                                <th>Languages</th>
+                                <td id="txtlanguage"></td>
+                            </tr>
+                            <tr>
+                                <th>Country Code</th>
+                                <td id="txtcode"></td>
+                            </tr>
+                            <tr>
+                                <th>Continent</th>
+                                <td id="txtcontinent"></td>
+                            </tr>
+                            <tr>
+                                <th>Currency</th>
+                                <td id="txtcurrency"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CIty Modal  -->
+    <div class="modal fade show" id="cityModal" tabindex="-1">
+        <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-light">
+                <div class="modal-header">
+                    <h3 id="county-name">Country Most Populated Cities</h3>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body overflow-auto">
+                    <table class=" table table-striped  " id="city-table">
+
+                        <tbody>
+                            <tr>
+                                <td id="txtcity" class="td-title"> City Name</td>
+                                <td id="txtCityPop" class="td-title"> Population</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- BootStrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+    <!-- LeafLet -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="JS/script.js"> </script>
+    <script src="JS/countryList.js"></script>
+    <!-- Leaflet EasyButtobn -->
+    <script src="https://unpkg.com/leaflet-easybutton/src/easy-button.js"></script>
+    <!-- LeafLet MarkerCluster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <!-- <script src="JS/countryname.js"></script> -->
+
+
+</body>
+
+</html>
