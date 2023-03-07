@@ -40,7 +40,7 @@ error_reporting(E_ERROR|E_PARSE);
 
 //$url = 'http://api.geonames.org/countryCodeJSON?lat=47.03&lng=10.2&username=drawinghub6';
 
-$url = "http://api.geonames.org/countryCodeJSON?lat=".$_REQUEST['lat']."&lng=".$_REQUEST['lng']."&username=drawinghub6";
+$url = "http://api.geonames.org/countryCodeJSON?lat=".$_REQUEST['latitude']."&lng=".$_REQUEST['longitude']."&username=drawinghub6";
 
 $ch = curl_init();
 
