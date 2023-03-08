@@ -103,7 +103,7 @@ function initMap() {
 
 // Call initMap on document ready
 $(document).ready(function () {
-    //  initMap();
+    // initMap();
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude;
@@ -111,6 +111,7 @@ $(document).ready(function () {
             $.ajax({
                 url: "PhP/countryCode.php",
                 dataType: 'json',
+                type: 'POST',
                 data: {
                     latitude: lat,
                     longitude: lng
@@ -142,11 +143,11 @@ $(document).ready(function () {
                 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
         }).addTo(map);
-        easyButton([51.505, -0.09], map);
+
     }
 
 
-    easyButton();
+    //  easyButtonMap();
 });
 
 
@@ -204,12 +205,13 @@ $('#iso-country').change(function () {
                 $("#txtcode").html(cou_code);
                 $("#txtcontinent").html(cou_continent);
                 $("#txtcurrency").html(cou_currency);
-                //Ajax for EarthQuakes
-                earthQukae();
+
+
             } else {
                 console.error('Error: Unable to get EWNS data');
             };
-
+            //Ajax for EarthQuakes
+            earthQukae();
 
             //city List
             $.ajax({
@@ -324,6 +326,62 @@ $('#iso-country').change(function () {
                     console.log("Error: " + error);
                 }
             });
+
+
+            // News List
+            $('#spinner').show();
+            $.ajax({
+                url: 'PhP/countryNews.php',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    country: cou_name
+                },
+                success: function (result_news) {
+                    //  console.log(result_news);
+                    $('#newsCountry').empty();
+                    let articleHtml = '';
+                    for (let n = 0; n < result_news.data.length; n++) {
+                        $('#newsCountry').html(cou_name + " Latest News");
+                        let news_img = result_news.data[n].image;
+                        let news_title = result_news.data[n].title;
+                        let news_des = result_news.data[n].description;
+                        let news_url = result_news.data[n].url;
+
+                        const newsContainer = $('#newsBody');
+
+                        articleHtml += `
+
+                        <div class="newsContainer">
+                            <div class="row">
+                             <div class="col-sm-6">
+                                <a href="${news_url}" target="_blank">
+                                <img id="newsImg" class="img-fluid img-thumbnail" src="${news_img}">
+                                </a>
+                            </div>
+                        <div class="col-sm-6">
+                            <a href="${news_url}" target="_blank" class="text-decoration-none">
+                            <h6 id="newstitle" class="fs-5 mt-3 mt-sm-1">${news_title}</h6>
+                            </a>
+                        </div>
+                        </div>
+                    <div class="row">
+                         <p id="newsDesc" class="mt-3 mb-4">${news_des}</p>
+                               </div>
+                            <hr>
+                            </div>
+                            `;
+
+                        newsContainer.html(articleHtml);
+
+                    }
+                }
+
+            }).done(function () {
+                $('#spinner').hide();
+            }).fail(function () {
+                $('#spinner').hide();
+            });
         }
     });
     $.ajax({
@@ -343,7 +401,7 @@ $('#iso-country').change(function () {
 
 
 
-function easyButton() {
+function easyButtonMap() {
 
     // sample bootstap modal 
     L.easyButton('<img src="images/info1.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
@@ -353,6 +411,10 @@ function easyButton() {
 
     L.easyButton('<img src="images/city.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
         $("#cityModal").modal('show');
+
+    }).addTo(map);
+    L.easyButton('<img src="images/news.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+        $("#newsModal").modal('show');
 
     }).addTo(map);
 
@@ -386,12 +448,21 @@ function earthQukae() {
                         earth_magnitude = earth_result.data[j].magnitude;
                         eartg_deapth = earth_result.data[j].depth;
                         // console.log(earth_lat);
-                        //console.log(earth_lng);
+                        // console.log(earth_dateTime);
+
+                        const [date, time] =
+                            earth_dateTime.split(' ');
+                        // console.log(date);
+                        //console.log(time);
+
                         earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
                             '<div class="container"><table class="table table-striped">' +
                             "<thead><tr><th>Earthquake Details</th></thead>" +
-                            "<tbody><tr><td> DateTime: </td><td>" +
-                            earth_dateTime +
+                            "<tbody><tr><td> Date: </td><td>" +
+                            date +
+                            "</td></tr>" +
+                            "<tr><td>Time: </td><td>" +
+                            time +
                             "</td></tr>" +
                             "<tr><td>Magnitude: </td><td>" +
                             earth_magnitude +

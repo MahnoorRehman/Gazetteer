@@ -52,11 +52,13 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2 class="modal-title" id="name">Country </h2>
+                    <h2 class="modal-title" id="name" style="font-weight: 600;">Country </h2>
                     <img id="flag" class='country-flag' src=""
                         style="width: 90px; height: 60px; display: block; margin: auto;" />
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
+
                 <div class="modal-body">
                     <table class=" table table-striped ">
 
@@ -103,7 +105,7 @@
         <div class="modal-dialog  modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content bg-light">
                 <div class="modal-header">
-                    <h3 id="county-name">Country Most Populated Cities</h3>
+                    <h3 id="county-name" style="font-weight: 500;">Country Most Populated Cities</h3>
 
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -125,9 +127,28 @@
 
 
     <!-- News Modal -->
-    
 
 
+    <div class="modal fade show" id="newsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 id="newsCountry" class="modal-title display-6" style="font-weight: 600;">Country Latest News
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="spinner" class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div id="" class="modal-body ">
+                    <div id="newsBody" class="container">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 

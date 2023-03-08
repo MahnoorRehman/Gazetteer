@@ -89,13 +89,30 @@ body {
 
 }
 
-
-
-
-
-
 .scrollable {
     max-height: 500px;
     overflow-y: scroll;
     margin-top: 35px;
+}
+
+.news-image {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 20px;
+    width: 200px;
+    height: 200px;
+}
+
+.news-title {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.spinner-border {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
