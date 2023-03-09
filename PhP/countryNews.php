@@ -4,9 +4,17 @@
 ini_set('display errors', 'on');
 error_reporting(E_ALL |E_PARSE);
 
-//$url="https://gnews.io/api/v4/search?q=United%20Kingdom&lang=en&country=uk&max=8&token=9f8e0ae551851d6129530b0c7e1ad47e";
 
-$url="https://gnews.io/api/v4/search?q=".$_REQUEST['country']."&lang=en&country=uk&max=10&token=9f8e0ae551851d6129530b0c7e1ad47e";
+//$country = $_REQUEST['country'];
+//echo "Searching for country: $country";
+//$url="https://gnews.io/api/v4/search?q=United%20Kingdom&lang=en&max=8&token=9f8e0ae551851d6129530b0c7e1ad47e";
+
+
+
+$url = 'https://gnews.io/api/v4/search?q=' . str_replace(' ', '+', $_REQUEST['country']) . '&lang=en&max=10&token=9f8e0ae551851d6129530b0c7e1ad47e';
+
+
+//$url=`https://gnews.io/api/v4/search?q=`.$_REQUEST['country'].`&lang=en&max=10&token=9f8e0ae551851d6129530b0c7e1ad47e`;
 
 $ch=curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

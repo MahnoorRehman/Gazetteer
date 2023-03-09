@@ -44,6 +44,8 @@ let earth_magnitude;
 let eartg_deapth;
 var earth_markers;
 
+let eqCity;
+
 //weather 
 let weather_city;
 //let weather_lat;
@@ -103,7 +105,7 @@ function initMap() {
 
 // Call initMap on document ready
 $(document).ready(function () {
-    // initMap();
+    initMap();
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude;
@@ -117,15 +119,9 @@ $(document).ready(function () {
                     longitude: lng
                 },
                 success: function (result_code) {
-                    console.log(result_code)
+                    // console.log(result_code)
                     $("#iso-country").val(result_code.data.countryCode).change();
-                    map = L.map('map').setView([lat, lng], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                        maxZoom: 18,
-                    }).addTo(map);
+
                     L.marker([lat, lng]).addTo(map);
                 },
                 error: function (error) {
@@ -143,10 +139,9 @@ $(document).ready(function () {
                 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
         }).addTo(map);
-
     }
 
-
+    easyButtonMap();
     //  easyButtonMap();
 });
 
@@ -205,8 +200,6 @@ $('#iso-country').change(function () {
                 $("#txtcode").html(cou_code);
                 $("#txtcontinent").html(cou_continent);
                 $("#txtcurrency").html(cou_currency);
-
-
             } else {
                 console.error('Error: Unable to get EWNS data');
             };
@@ -250,14 +243,10 @@ $('#iso-country').change(function () {
                                     success: function (wiki_result) {
                                         // console.log(wiki_result);
 
-                                        //if (typeof wiki_result.data[i] !== 'undefined' && wiki_result.data[i] !== null) {
+                                        //  if (typeof wiki_result.data[i] !== 'undefined' && wiki_result.data[i] !== null) {
                                         wiki_summary = wiki_result.data[0].summary;
                                         wiki_url = wiki_result.data[0].wikipediaUrl;
-                                        //  console.log(wiki_url);
-                                        // console.log(wiki_summary);
-                                        // } else {
-                                        //     console.log('');
-                                        // }
+
 
                                         markers.addLayer(L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
                                             '<h2>' + city_name + '</h2>' +
@@ -273,7 +262,7 @@ $('#iso-country').change(function () {
 
                                 //Weather AjAX
                                 $.ajax({
-                                    url: 'PhP/weather.php',
+                                    url: 'PhP/cityWeather.php',
                                     type: 'POST',
                                     dataType: 'json',
                                     data: {
@@ -314,6 +303,7 @@ $('#iso-country').change(function () {
                                         console.log(error);
                                     }
                                 });
+
                             } catch (error) {
                                 console.log(error);
                             }
@@ -329,7 +319,8 @@ $('#iso-country').change(function () {
 
 
             // News List
-            $('#spinner').show();
+            //  $('#spinner').show();
+            // console.log(cou_name);
             $.ajax({
                 url: 'PhP/countryNews.php',
                 dataType: 'json',
@@ -338,11 +329,12 @@ $('#iso-country').change(function () {
                     country: cou_name
                 },
                 success: function (result_news) {
-                    //  console.log(result_news);
+                    // console.log(result_news);
                     $('#newsCountry').empty();
                     let articleHtml = '';
                     for (let n = 0; n < result_news.data.length; n++) {
-                        $('#newsCountry').html(cou_name + " Latest News");
+                        $('#newsCountry').html(cou_name + `'s Latest News`);
+                        //console.log(cou_name);
                         let news_img = result_news.data[n].image;
                         let news_title = result_news.data[n].title;
                         let news_des = result_news.data[n].description;
@@ -375,12 +367,29 @@ $('#iso-country').change(function () {
                         newsContainer.html(articleHtml);
 
                     }
+                }, error: function (xhr, status, error) {
+                    console.error('Error fetching News:', error);
                 }
 
-            }).done(function () {
-                $('#spinner').hide();
-            }).fail(function () {
-                $('#spinner').hide();
+            });
+            // .done(function () {
+            //     $('#spinner').hide();
+            // }).fail(function () {
+            //     $('#spinner').hide();
+            // });
+
+
+            // Country Current Weather
+            $.ajax({
+                url: 'PhP/current_weather.php',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    country: cou_name,
+                },
+                success: function (cou_weather_result) {
+                    //  console.log(cou_weather_result);
+                }
             });
         }
     });
@@ -442,36 +451,62 @@ function earthQukae() {
                     earth_markers = L.markerClusterGroup();
                     earth_markers.clearLayers();
                     for (j = 0; j < earth_result.data.length; j++) {
-                        earth_lat = earth_result.data[j].lat;
-                        earth_lng = earth_result.data[j].lng;
-                        earth_dateTime = earth_result.data[j].datetime;
-                        earth_magnitude = earth_result.data[j].magnitude;
-                        eartg_deapth = earth_result.data[j].depth;
-                        // console.log(earth_lat);
-                        // console.log(earth_dateTime);
+                        (function (j) {
+                            earth_lat = earth_result.data[j].lat;
+                            earth_lng = earth_result.data[j].lng;
+                            earth_dateTime = earth_result.data[j].datetime;
+                            earth_magnitude = earth_result.data[j].magnitude;
+                            eartg_deapth = earth_result.data[j].depth;
+                            // console.log("Lati" + earth_lat);
+                            // console.log("Langi" + earth_lng);
 
-                        const [date, time] =
-                            earth_dateTime.split(' ');
-                        // console.log(date);
-                        //console.log(time);
+                            const [date, time] =
+                                earth_dateTime.split(' ');
+                            try {
+                                $.ajax({
+                                    url: 'PhP/earthequake_city.php',
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        latitude: earth_lat,
+                                        longitude: earth_lng
+                                    },
+                                    success: function (eqCityName_result) {
+                                        // console.log(eqCityName_result);
+                                        if (typeof eqCityName_result !== 'undefined' && eqCityName_result.data !== null) {
+                                            eqCity = eqCityName_result.data[0].name;
+                                            // console.log(eqCity)
+                                            earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
+                                                '<div class="container"><table class="table table-striped">' +
+                                                "<thead><tr><th>" + eqCity + "</th></thead>" +
+                                                "<tbody><tr><td> Date: </td><td>" +
+                                                date +
+                                                "</td></tr>" +
+                                                "<tr><td>Time: </td><td>" +
+                                                time +
+                                                "</td></tr>" +
+                                                "<tr><td>Magnitude: </td><td>" +
+                                                earth_magnitude +
+                                                "</td></tr>" +
+                                                "<tr><td> Depth: </td><td>" +
+                                                eartg_deapth +
+                                                "</td></tr>"
 
-                        earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
-                            '<div class="container"><table class="table table-striped">' +
-                            "<thead><tr><th>Earthquake Details</th></thead>" +
-                            "<tbody><tr><td> Date: </td><td>" +
-                            date +
-                            "</td></tr>" +
-                            "<tr><td>Time: </td><td>" +
-                            time +
-                            "</td></tr>" +
-                            "<tr><td>Magnitude: </td><td>" +
-                            earth_magnitude +
-                            "</td></tr>" +
-                            "<tr><td> Depth: </td><td>" +
-                            eartg_deapth +
-                            "</td></tr>"
+                                            ));
+                                        } else {
+                                            console.log('Earthquake Error');
+                                        }
+                                    }, error: function (xhr, status, error) {
+                                        console.log(xhr.responseText);
+                                        console.log(status);
+                                        console.log(error);
+                                    }
+                                });
+                            } catch (error) {
+                                console.log('try catch ' + error);
+                            }
+                        })(j);
 
-                        ));
                     }
                     map.addLayer(earth_markers);
                 }

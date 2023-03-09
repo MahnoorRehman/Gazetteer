@@ -2,9 +2,9 @@
 
 ini_set('display errors', 'on');
 error_reporting(E_ERROR|E_PARSE);
-
+$city = urlencode($_REQUEST['city']);
 //$url='http://api.geonames.org/wikipediaSearchJSON?q=quetta&maxRows=10&username=drawinghub6';
-$url="http://api.geonames.org/wikipediaSearchJSON?q=".$_REQUEST['city']."&maxRows=15&username=drawinghub6";
+$url="http://api.geonames.org/wikipediaSearchJSON?q=$city&maxRows=15&username=drawinghub6";
 
 //$url="http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=". $_REQUEST['north'] ."&south=". $_REQUEST['south'] ."&east=".$_REQUEST['east']."&west=". $_REQUEST['west'] ."&username=drawinghub6&style=full";
 $ch=curl_init();
