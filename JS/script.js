@@ -4,7 +4,7 @@ setTimeout(function () {
     var preloader = document.querySelector(".preloader-container");
     preloader.style.display = "none";
     var realData = document.querySelector(".real-data-container");
-    realData.style.display = "block";
+    // realData.style.display = "block";
 }, 1000);
 
 
@@ -53,7 +53,7 @@ let weather_city;
 //let weather_clouds;
 //let weather_temp;
 //let weather_wind;
-
+var earthquakeLayer = L.layerGroup();
 
 var myIcon = L.icon({
     iconUrl: 'images/wiki.png',
@@ -78,9 +78,9 @@ var weatherMarker = L.icon({
 function initMap() {
 
     map = L.map('map').setView([lati, lngi], 4);
-    var openStreetMap = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png', {
-        maxZoom: 20,
-        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    var openStreetMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
     openStreetMap.options.attribution = '';
     openStreetMap.addTo(map);
@@ -91,15 +91,17 @@ function initMap() {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
-    // var overlayMap = {
-    //     'Earth': earth_markers,
-    // }
+
+    var overlayMap = {
+        'EarthQuake': earthquakeLayer,
+    }
     var baseMaps = {
 
         "Satalite": satalite,
         "Street": openStreetMap,
     };
-    var layerControl = L.control.layers(baseMaps).addTo(map);
+
+    var layerControl = L.control.layers(baseMaps, overlayMap, { checked: false }).addTo(map);
 
 }
 
@@ -320,7 +322,7 @@ $('#iso-country').change(function () {
 
             // News List
             //  $('#spinner').show();
-            // console.log(cou_name);
+            console.log(cou_name);
             $.ajax({
                 url: 'PhP/countryNews.php',
                 dataType: 'json',
@@ -388,7 +390,31 @@ $('#iso-country').change(function () {
                     country: cou_name,
                 },
                 success: function (cou_weather_result) {
-                    //  console.log(cou_weather_result);
+                    //console.log(cou_weather_result);
+                    $('#weatherCountry').empty();
+                    $('#weatherCountry').html(cou_name);
+                    let current_temp = cou_weather_result.data.main['temp'];
+                    let temp_feel = cou_weather_result.data.main['feels_like'];
+                    let description = cou_weather_result.data.weather[0]['description'];
+                    let icon = cou_weather_result.data.weather[0]['icon'];
+                    let sunRise = cou_weather_result.data.sys['sunrise'];
+                    let sunSet = cou_weather_result.data.sys['sunset'];
+                    const sunRiseTime = new Date(sunRise * 1000).toLocaleTimeString();
+                    const sunSetTime = new Date(sunSet * 1000).toLocaleTimeString();
+                    // console.log(sunriseTime);
+                    //  console.log(temp_feel);
+                    // console.log(description);
+                    // console.log(icon);
+                    // console.log(sunRise);
+                    // console.log(sunSet);
+                    let celsius_temp = (current_temp - 273.15).toFixed(0);
+                    let celsius_feel = (temp_feel - 273.15).toFixed(0);
+                    $('#nowWeatherImg').attr('src', "http://openweathermap.org/img/wn/" + icon + "@4x.png");
+                    $('#nowWeatherDescription').html(description);
+                    $('#noewTemp').html('Temperature: ' + celsius_temp + "°C");
+                    $('#feelTemp').html('Feels Like: ' + celsius_feel + "°C");
+                    $('#sunRise').html('Sun Rise: ' + sunRiseTime);
+                    $('#sunSet').html('Sun Set: ' + sunSetTime);
                 }
             });
         }
@@ -422,6 +448,10 @@ function easyButtonMap() {
         $("#cityModal").modal('show');
 
     }).addTo(map);
+    L.easyButton('<img src="images/cloudy.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+        $("#weatherMOdal").modal('show');
+
+    }).addTo(map);
     L.easyButton('<img src="images/news.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
         $("#newsModal").modal('show');
 
@@ -432,89 +462,92 @@ function easyButtonMap() {
 
 
 function earthQukae() {
-    if (!earthquake_button_added) {
-        L.easyButton('<img src="images/crack.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+    //  if (!earthquake_button_added) {
+    //    L.easyButton('<img src="images/crack.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
 
-            $.ajax({
-                url: 'PhP/earthquake.php',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    north: north_value,
-                    south: south_value,
-                    east: east_value,
-                    west: west_value,
+    $.ajax({
+        url: 'PhP/earthquake.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            north: north_value,
+            south: south_value,
+            east: east_value,
+            west: west_value,
 
-                },
-                success: function (earth_result) {
-                    // console.log(earth_result);
-                    earth_markers = L.markerClusterGroup();
-                    earth_markers.clearLayers();
-                    for (j = 0; j < earth_result.data.length; j++) {
-                        (function (j) {
-                            earth_lat = earth_result.data[j].lat;
-                            earth_lng = earth_result.data[j].lng;
-                            earth_dateTime = earth_result.data[j].datetime;
-                            earth_magnitude = earth_result.data[j].magnitude;
-                            eartg_deapth = earth_result.data[j].depth;
-                            // console.log("Lati" + earth_lat);
-                            // console.log("Langi" + earth_lng);
+        },
+        success: function (earth_result) {
+            // console.log(earth_result);
+            earth_markers = L.markerClusterGroup();
+            //  earth_markers.clearLayers();
+            earthquakeLayer.clearLayers();
+            for (j = 0; j < earth_result.data.length; j++) {
+                (function (j) {
+                    earth_lat = earth_result.data[j].lat;
+                    earth_lng = earth_result.data[j].lng;
+                    earth_dateTime = earth_result.data[j].datetime;
+                    earth_magnitude = earth_result.data[j].magnitude;
+                    eartg_deapth = earth_result.data[j].depth;
+                    // console.log("Lati" + earth_lat);
+                    // console.log("Langi" + earth_lng);
 
-                            const [date, time] =
-                                earth_dateTime.split(' ');
-                            try {
-                                $.ajax({
-                                    url: 'PhP/earthequake_city.php',
-                                    type: "POST",
-                                    dataType: "json",
-                                    data: {
-                                        latitude: earth_lat,
-                                        longitude: earth_lng
-                                    },
-                                    success: function (eqCityName_result) {
-                                        // console.log(eqCityName_result);
-                                        if (typeof eqCityName_result !== 'undefined' && eqCityName_result.data !== null) {
-                                            eqCity = eqCityName_result.data[0].name;
-                                            // console.log(eqCity)
-                                            earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
-                                                '<div class="container"><table class="table table-striped">' +
-                                                "<thead><tr><th>" + eqCity + "</th></thead>" +
-                                                "<tbody><tr><td> Date: </td><td>" +
-                                                date +
-                                                "</td></tr>" +
-                                                "<tr><td>Time: </td><td>" +
-                                                time +
-                                                "</td></tr>" +
-                                                "<tr><td>Magnitude: </td><td>" +
-                                                earth_magnitude +
-                                                "</td></tr>" +
-                                                "<tr><td> Depth: </td><td>" +
-                                                eartg_deapth +
-                                                "</td></tr>"
+                    const [date, time] =
+                        earth_dateTime.split(' ');
+                    try {
+                        $.ajax({
+                            url: 'PhP/earthequake_city.php',
+                            type: "POST",
+                            dataType: "json",
+                            data: {
+                                latitude: earth_lat,
+                                longitude: earth_lng
+                            },
+                            success: function (eqCityName_result) {
+                                // console.log(eqCityName_result);
+                                if (typeof eqCityName_result !== 'undefined' && eqCityName_result.data !== null) {
+                                    eqCity = eqCityName_result.data[0].name;
+                                    // console.log(eqCity)
+                                    earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
+                                        '<div class="container"><table class="table table-striped">' +
+                                        "<thead><tr><th>" + eqCity + "</th></thead>" +
+                                        "<tbody><tr><td> Date: </td><td>" +
+                                        date +
+                                        "</td></tr>" +
+                                        "<tr><td>Time: </td><td>" +
+                                        time +
+                                        "</td></tr>" +
+                                        "<tr><td>Magnitude: </td><td>" +
+                                        earth_magnitude +
+                                        "</td></tr>" +
+                                        "<tr><td> Depth: </td><td>" +
+                                        eartg_deapth +
+                                        "</td></tr>"
 
-                                            ));
-                                        } else {
-                                            console.log('Earthquake Error');
-                                        }
-                                    }, error: function (xhr, status, error) {
-                                        console.log(xhr.responseText);
-                                        console.log(status);
-                                        console.log(error);
-                                    }
-                                });
-                            } catch (error) {
-                                console.log('try catch ' + error);
+                                    ));
+                                    earthquakeLayer.addLayer(earth_markers);
+
+                                } else {
+                                    console.log('Earthquake Error');
+                                }
+                            }, error: function (xhr, status, error) {
+                                console.log(xhr.responseText);
+                                console.log(status);
+                                console.log(error);
                             }
-                        })(j);
-
+                        });
+                    } catch (error) {
+                        console.log('try catch ' + error);
                     }
-                    map.addLayer(earth_markers);
-                }
-            });
+                })(j);
 
-        }).addTo(map);
-        earthquake_button_added = true;
-    }
+            }
+            map.addLayer(earthquakeLayer);
+        }
+    });
+
+    //    }).addTo(map);
+    //   earthquake_button_added = true;
+    //  }
 }
 
 

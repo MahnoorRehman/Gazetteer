@@ -45,9 +45,7 @@ body {
     height: 180px;
 }
 
-.leaflet-container {
-    position: relative;
-}
+
 
 #map {
     width: 100%;
@@ -55,15 +53,9 @@ body {
 
 }
 
-.leaflet-map {
-    position: absolute;
-    z-index: 1;
-
-
-}
-
 .dropdown {
-    position: relative;
+    position: absolute !important;
+    left: 40%;
     margin: auto;
     top: 15px;
     z-index: 1000;
@@ -76,6 +68,8 @@ body {
 
 #iso-country {
     font-size: 16px;
+    border: 2px solid #FFA700;
+    background-color: #eef9b8;
 
 }
 
@@ -115,4 +109,8 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+tr:nth-child(odd) {
+    background-color: #eef9b8;
 }

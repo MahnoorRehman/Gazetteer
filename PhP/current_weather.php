@@ -3,7 +3,8 @@
 ini_set('display errors', 'on');
 error_reporting(E_ALL|E_PARSE);
 
-$url="http://api.openweathermap.org/data/2.5/weather?q=".$_REQUEST['country']."&appid=8c797837211bd55bafdcadd9bc8cb2fc";
+$url="http://api.openweathermap.org/data/2.5/weather?q=".$_REQUEST['country']."&mode=json&units=kelvin&appid=8c797837211bd55bafdcadd9bc8cb2fc";
+//$url="http://api.openweathermap.org/data/2.5/forecast?q=pakistan&appid=8c797837211bd55bafdcadd9bc8cb2fc";
 
 
 $ch=curl_init();

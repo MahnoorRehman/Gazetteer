@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/popUp.css">
 
-
+    <link rel="icon" type="image/x-icon" href="/images/globe.png">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
         integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
@@ -33,19 +33,21 @@
 </head>
 
 <body>
-    <div class="main">
-        <div class="preloader-container">
-            <img src="images/map.gif" alt="Loading...">
-        </div>
-        <div id="map" class="real-data-container leaflet-map leaflet-container"></div>
-        <!-- countrylist -->
-        <div class="dropdown country-dropdown">
-            <select name="country" id="iso-country">
-                <option id="option">Counrty</option>
-            </select>
 
-        </div>
+    <div class="preloader-container">
+        <img src="images/map.gif" alt="Loading...">
     </div>
+
+
+
+    <!-- countrylist -->
+    <div class="dropdown ">
+        <select class="country-dropdown" name="country" id="iso-country">
+            <option id="option">Counrty</option>
+        </select>
+
+    </div>
+    <div id="map"></div>
 
     <!-- Country Info Modal -->
     <div class="modal fade show" id="exampleModal" tabindex="-1">
@@ -110,7 +112,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body overflow-auto">
-                    <table class=" table table-striped  " id="city-table">
+                    <table class=" table table-striped   " id="city-table">
 
                         <tbody>
                             <tr>
@@ -143,6 +145,57 @@
                 <div id="" class="modal-body ">
                     <div id="newsBody" class="container">
 
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- WeatherModal -->
+
+    <div class="modal" id="weatherMOdal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title display-6" style="font-weight: 600;" id="weatherCountry">Country</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body container">
+                    <h5 class="mb-3 mt-0 ms-1 display-6" style="font-size: 1.5rem; font-weight: 500;">Current Weather
+                    </h5>
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="col-4 p-0">
+                                <div class="card" style="min-width: 110px">
+                                    <!-- <div class="container"> -->
+                                    <img id="nowWeatherImg" src="" class="card-img-top img-fluid" alt=""
+                                        style="min-width: 110px; ">
+                                    <!-- </div> -->
+                                </div>
+                            </div>
+
+                            <div class="col-8">
+                                <div class="card">
+                                    <ul class="list-group list-group-flush">
+                                        <li id="nowWeatherDescription"
+                                            class="nowWeatherText list-group-item p-1 text-capitalize fw-bolder fs-6">
+                                            current weather</li>
+                                        <li id="noewTemp" class="nowWeatherText list-group-item p-1">Temperature</li>
+                                        <li id="feelTemp" class="nowWeatherText list-group-item p-1">Feels Like
+                                        </li>
+                                        <li id="sunRise" class="nowWeatherText list-group-item p-1">Sun Rise
+                                        </li>
+                                        <li id="sunSet" class="nowWeatherText list-group-item p-1">Sun Set
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
