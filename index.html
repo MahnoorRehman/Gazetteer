@@ -27,8 +27,6 @@
     <script src="JS/jquery-2.2.3.min.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-
-
     <title>GAZETTEER</title>
 </head>
 
@@ -38,19 +36,26 @@
         <img src="images/map.gif" alt="Loading...">
     </div>
 
-
-
     <!-- countrylist -->
-    <div class="dropdown ">
-        <select class="country-dropdown" name="country" id="iso-country">
-            <option id="option">Counrty</option>
-        </select>
+    <div class="container-sm  fixed-top mt-2 w-50 mx-auto">
+        <div class="row mx-auto">
+            <div class="col-12 col-sm-8 col-lg-5 col-xl-4 mx-auto">
+                <div class="dropdown ">
 
+                    <select class="country-dropdown form-select form-select-sm" name="country" id="iso-country"
+                        aria-label=".form-select-sm example">
+                        <option id="option">Counrty</option>
+                    </select>
+
+                </div>
+
+            </div>
+        </div>
     </div>
     <div id="map"></div>
 
     <!-- Country Info Modal -->
-    <div class="modal fade show" id="exampleModal" tabindex="-1">
+    <div class="modal fade show" id="infoModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -154,7 +159,7 @@
 
 
 
-    <!-- WeatherModal -->
+    <!-- Weather Modal -->
 
     <div class="modal" id="weatherMOdal" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
@@ -199,6 +204,86 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Country WikiPedia Modal -->
+    <div class="modal" id="countrywikipediaModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title display-6" style="font-weight: 600;" id="wikiCountryName">Country</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h3>Summary:</h3>
+                    <!-- <img id="wikipediaThumbnail" src="" class="card-img-top img-fluid" alt="" style="min-width: 50px; "> -->
+                    <p id="wikipediaSummary">Summary</p>
+                    <a id="wikipedialink" target="_blank" href="">Read
+                        More</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Currency Modal -->
+
+    <div class="modal fade" id="currencyModal" tabindex="-1" aria-labelledby="currencyModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content bg-light">
+                <div class="modal-header">
+                    <h4 class="modal-title display-6 " style="font-weight: 600;">Currency Converter</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="currencyBodyContainer">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Code</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="currencyTitle" class="currencyTableEntry">Item1</td>
+                                    <td id="currencyCode" class="currencyTableEntry">Item2</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="container d-flex justify-content-around align-items-center">
+                            <p class="currencyInfo ms-2" id="onePoundOfCurrency">First</p>
+                        </div>
+                        <hr>
+                        <div class="container">
+                            <div class="topPart d-flex justify-content-around align-items-center">
+                                <div class="money">
+                                    <span id="currencySymbol"></span>
+                                    <input type="number" class="form-input" id="number" value="" min="1">
+                                </div>
+                                <div>
+                                    <!-- <span class="bi bi-arrow-left-right"></span> -->
+                                    <img src="images/right-arrow.png" style="width: 50px; height: 40px;" />
+                                </div>
+                                <div class="currencySelect">
+                                    <select id="currencyCodeList" class="browser-default custom-select itemsClass">
+                                        <option value="0" selected="" id="">Select Currency</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <div class="container d-flex justify-content-around align-items-center">
+                            <p class="currencyInfo ms-2" id="finalCurrency">Final </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

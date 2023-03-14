@@ -32,7 +32,9 @@ let cou_area;
 let cou_language;
 let cou_code;
 let cou_continent;
+
 let i;
+let polygonLayer;
 var popupClassName = 'my-popup';
 
 //eathquake
@@ -43,18 +45,19 @@ let earth_dateTime;
 let earth_magnitude;
 let eartg_deapth;
 var earth_markers;
-
 let eqCity;
 
 //weather 
 let weather_city;
-//let weather_lat;
-//let weather_lng;
-//let weather_clouds;
-//let weather_temp;
-//let weather_wind;
-var earthquakeLayer = L.layerGroup();
 
+
+//Currency
+let currencyInput;
+let currencyValue;
+let currencyName;
+
+var earthquakeLayer = L.layerGroup();
+let wiki_marker;
 var myIcon = L.icon({
     iconUrl: 'images/wiki.png',
     iconSize: [30, 38],
@@ -67,6 +70,7 @@ var earthMarker = L.icon({
     iconAnchor: [22, 94],
     popupAnchor: [-3, -76],
 });
+let weather_markers;
 var weatherMarker = L.icon({
     iconUrl: 'images/cloudy.png',
     iconSize: [30, 38],
@@ -84,23 +88,19 @@ function initMap() {
     });
     openStreetMap.options.attribution = '';
     openStreetMap.addTo(map);
-    L.control.attribution()
-    //var marker = L.marker([lati, lngi]).addTo(map);
-    //marker.bindPopup("<b>Hello world!</b><br />I am a popup.");
+    L.control.attribution();
     var satalite = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
-
     var overlayMap = {
-        'EarthQuake': earthquakeLayer,
+        //'EarthQuake': earthquakeLayer,
     }
     var baseMaps = {
 
         "Satalite": satalite,
         "Street": openStreetMap,
     };
-
     var layerControl = L.control.layers(baseMaps, overlayMap, { checked: false }).addTo(map);
 
 }
@@ -121,13 +121,9 @@ $(document).ready(function () {
                     longitude: lng
                 },
                 success: function (result_code) {
-                    // console.log(result_code)
                     $("#iso-country").val(result_code.data.countryCode).change();
-
-                    L.marker([lat, lng]).addTo(map);
                 },
                 error: function (error) {
-
                     console.log(error);
 
                 }
@@ -144,15 +140,14 @@ $(document).ready(function () {
     }
 
     easyButtonMap();
-    //  easyButtonMap();
+
 });
 
 
-// Call initMap when dropdown menu is changed
+
 $('#iso-country').change(function () {
     var countryCode = $(this).val();
-    // console.log(countryCode);
-    //console.log('i am dropdown');
+
     $.ajax({
         url: 'PhP/polygone.php',
         dataType: 'json',
@@ -162,9 +157,13 @@ $('#iso-country').change(function () {
             // Create a new GeoJSON layer with the fetched polygon data
             let jsondata = JSON.stringify(result);
             const data = JSON.parse(jsondata);
-            var polygonLayer = L.geoJSON(data).addTo(map);
+            //Remove previous layer
+            if (polygonLayer) {
+                map.removeLayer(polygonLayer);
+            }
+            polygonLayer = L.geoJSON(data).addTo(map);
             map.fitBounds(polygonLayer.getBounds());
-            polygonLayer.setStyle({ fillColor: 'pink', color: '#FFA700' });
+            polygonLayer.setStyle({ fillColor: 'yellow', color: '#FFA700' });
         },
         error: function (xhr, status, error) {
             console.error('Error fetching polygon:', error);
@@ -194,6 +193,7 @@ $('#iso-country').change(function () {
                 cou_continent = result_EWNS.data[0].continentName;
                 cou_language = result_EWNS.data[0].languages;
                 cou_currency = result_EWNS.data[0].currencyCode;
+
                 $("#name").html(cou_name);
                 $("#txtcapital").html(cou_capital);
                 $("#txtpopulation").html(cou_populatin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
@@ -220,9 +220,15 @@ $('#iso-country').change(function () {
                     // console.log(city_result);
                     let json_city = JSON.stringify(city_result);
                     const city_data = JSON.parse(json_city);
-                    var markers = L.markerClusterGroup();
-                    markers.clearLayers();
-                    var weather_markers = L.markerClusterGroup();
+                    if (wiki_marker) {
+                        map.removeLayer(wiki_marker);
+                    }
+                    wiki_marker = L.markerClusterGroup();
+                    wiki_marker.clearLayers();
+                    if (weather_markers) {
+                        map.removeLayer(weather_markers);
+                    }
+                    weather_markers = L.markerClusterGroup();
                     weather_markers.clearLayers();
                     $('#city-table').empty();
                     for (i = 0; i < city_result.data.length; i++) {
@@ -250,7 +256,7 @@ $('#iso-country').change(function () {
                                         wiki_url = wiki_result.data[0].wikipediaUrl;
 
 
-                                        markers.addLayer(L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
+                                        wiki_marker.addLayer(L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
                                             '<h2>' + city_name + '</h2>' +
                                             //'<img src="' + wiki_thumbnail + '">' +
                                             '<p>' + wiki_summary + '</p>' +
@@ -262,7 +268,7 @@ $('#iso-country').change(function () {
                                     }
                                 });
 
-                                //Weather AjAX
+                                //CITY Weather AjAX
                                 $.ajax({
                                     url: 'PhP/cityWeather.php',
                                     type: 'POST',
@@ -311,7 +317,7 @@ $('#iso-country').change(function () {
                             }
                         })(i);
                     }
-                    map.addLayer(markers);
+                    map.addLayer(wiki_marker);
                     map.addLayer(weather_markers);
                 },
                 error: function (xhr, status, error) {
@@ -320,9 +326,7 @@ $('#iso-country').change(function () {
             });
 
 
-            // News List
-            //  $('#spinner').show();
-            console.log(cou_name);
+
             $.ajax({
                 url: 'PhP/countryNews.php',
                 dataType: 'json',
@@ -374,11 +378,6 @@ $('#iso-country').change(function () {
                 }
 
             });
-            // .done(function () {
-            //     $('#spinner').hide();
-            // }).fail(function () {
-            //     $('#spinner').hide();
-            // });
 
 
             // Country Current Weather
@@ -417,6 +416,96 @@ $('#iso-country').change(function () {
                     $('#sunSet').html('Sun Set: ' + sunSetTime);
                 }
             });
+
+
+            //country Wikipedia
+            $.ajax({
+                url: 'PhP/wikipedia.php',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    city: cou_name,
+                },
+                success: function (cou_wikipedia) {
+                    //  console.log(cou_wikipedia);
+                    $('#wikiCountryName').empty();
+                    $('#wikipediaSummary').empty();
+                    let cou_wikiSummary = cou_wikipedia.data[0].summary;
+                    let cou_wikiUrl = cou_wikipedia.data[0].wikipediaUrl;
+                    let cou_image = cou_wikipedia.data[0].thumbnailImg;
+                    $('#wikiCountryName').html(cou_name);
+                    $('#wikipediaSummary').html(cou_wikiSummary);
+                    //  $(wikipediaThumbnail).attr('src', cou_image);
+                    $('#wikipedialink').attr('href', `https://${cou_wikiUrl.trim()}`);
+                    $('#wikipedialink').html(`https://${cou_wikiUrl.trim()}`);
+
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching Country WikiPedia:', error);
+                }
+            });
+
+            // Curreny
+
+            $.ajax({
+                url: 'PhP/currency.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    cCode: cou_currency
+                },
+                success: function (currency_result) {
+
+                    $('#currencyTitle').html(cou_name);
+                    $('#currencyCode').html(cou_currency);
+                    if (currency_result.status.name == 'ok') {
+
+                        let codes = Object.keys(currency_result.data);
+
+                        let value = Object.values(currency_result.data);
+
+                        let dropdown = document.getElementById('currencyCodeList');
+                        dropdown.innerHTML = '';
+                        for (let i = 0; i < codes.length; i++) {
+                            const option = document.createElement('option');
+                            option.value = value[i];
+                            option.textContent = codes[i];
+                            dropdown.appendChild(option);
+                        }
+
+                        let numberVal = document.querySelector('#number');
+                        numberVal.value = '';
+                        let currencyCodeList = document.querySelector('#currencyCodeList');
+                        let finalCurrency;
+
+                        numberVal.addEventListener('input', () => {
+                            currencyInput = numberVal.value;
+                            //    console.log("Chnage Value is" + currencyInput);
+                            finalCurrency = currencyInput * parseFloat(currencyCodeList.value);
+                            //  console.log("final Currancy" + finalCurrency);
+                            $('#finalCurrency').html(finalCurrency);
+
+                        });
+                        $('#onePoundOfCurrency').empty();
+                        $('#finalCurrency').empty();
+                        currencyCodeList.addEventListener('change', function () {
+                            currencyValue = $(this).val();
+                            currencyName = $(this).find('option:selected').text();
+                            //console.log(currencyValue);
+                            //console.log(currencyName);
+                            $('#onePoundOfCurrency').html("1 " + cou_currency + "=" + currencyValue + " " + currencyName);
+                            finalCurrency = currencyInput * parseFloat(currencyCodeList.value);
+                            $('#finalCurrency').html(finalCurrency + " " + currencyName);
+                        });
+                    } else {
+                        console.log('error');
+                    }
+
+                }
+
+            });
+
         }
     });
     $.ajax({
@@ -431,7 +520,11 @@ $('#iso-country').change(function () {
             $('#flag').attr('src', flag_result.data);
         }
     });
+
+
 });
+
+
 
 
 
@@ -440,7 +533,7 @@ function easyButtonMap() {
 
     // sample bootstap modal 
     L.easyButton('<img src="images/info1.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
-        $("#exampleModal").modal('show');
+        $("#infoModal").modal('show');
 
     }).addTo(map);
 
@@ -454,6 +547,14 @@ function easyButtonMap() {
     }).addTo(map);
     L.easyButton('<img src="images/news.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
         $("#newsModal").modal('show');
+
+    }).addTo(map);
+    L.easyButton('<img src="images/wikipedia.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+        $("#countrywikipediaModal").modal('show');
+
+    }).addTo(map);
+    L.easyButton('<img src="images/money.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+        $("#currencyModal").modal('show');
 
     }).addTo(map);
 
@@ -507,24 +608,17 @@ function earthQukae() {
                                 if (typeof eqCityName_result !== 'undefined' && eqCityName_result.data !== null) {
                                     eqCity = eqCityName_result.data[0].name;
                                     // console.log(eqCity)
-                                    earth_markers.addLayer(L.marker([earth_lat, earth_lng], { icon: earthMarker }).bindPopup(
-                                        '<div class="container"><table class="table table-striped">' +
-                                        "<thead><tr><th>" + eqCity + "</th></thead>" +
-                                        "<tbody><tr><td> Date: </td><td>" +
-                                        date +
-                                        "</td></tr>" +
-                                        "<tr><td>Time: </td><td>" +
-                                        time +
-                                        "</td></tr>" +
-                                        "<tr><td>Magnitude: </td><td>" +
-                                        earth_magnitude +
-                                        "</td></tr>" +
-                                        "<tr><td> Depth: </td><td>" +
-                                        eartg_deapth +
-                                        "</td></tr>"
+                                    earthquakeLayer.addLayer(L.marker([earth_result.data[j].lat, earth_result.data[j].lng], { icon: earthMarker }).bindPopup(
+                                        '<h5 style="font-weight: bold;">' + eqCity + '</h5>' +
+                                        '<div class="container"><table class="table">' +
+                                        //'<thead><th style="background: none;">' + eqCity + '</th></thead>' +
+                                        '<tbody><tr><td> Date: </td><td>' + date + '</td></tr>' +
+                                        '<tr><td>Time: </td><td>' + time + '</td></tr>' +
+                                        '<tr><td>Magnitude: </td><td>' + earth_magnitude + '</td></tr>' +
+                                        '<tr><td> Depth: </td><td>' + eartg_deapth + '</td></tr></table></div>'
 
                                     ));
-                                    earthquakeLayer.addLayer(earth_markers);
+                                    // earthquakeLayer.addLayer(earth_markers);
 
                                 } else {
                                     console.log('Earthquake Error');

@@ -33,7 +33,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #fff;
+    background-color: #eef9b8;
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -45,12 +45,9 @@ body {
     height: 180px;
 }
 
-
-
 #map {
     width: 100%;
     height: 100vh;
-
 }
 
 .dropdown {
@@ -67,7 +64,7 @@ body {
 }
 
 #iso-country {
-    font-size: 16px;
+
     border: 2px solid #FFA700;
     background-color: #eef9b8;
 
@@ -112,5 +109,5 @@ body {
 }
 
 tr:nth-child(odd) {
-    background-color: #eef9b8;
+    background-color: #afddef;
 }
