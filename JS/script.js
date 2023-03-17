@@ -1,11 +1,14 @@
 
 
-setTimeout(function () {
-    var preloader = document.querySelector(".preloader-container");
-    preloader.style.display = "none";
-    var realData = document.querySelector(".real-data-container");
-    // realData.style.display = "block";
-}, 1000);
+window.addEventListener("load", function () {
+    const loader = document.querySelector("#loader");
+    //  const preloader = document.querySelector("#preloader");
+    setTimeout(function () {
+        loader.style.display = "none";
+        preloader.style.display = "none";
+    }, 2000); // Change 2000 to the desired number of milliseconds for the preloader to display
+});
+
 
 
 let lati = 55.3781;
@@ -46,7 +49,7 @@ let earth_magnitude;
 let eartg_deapth;
 var earth_markers;
 let eqCity;
-
+let earthquakeCluster;
 //weather 
 let weather_city;
 
@@ -56,7 +59,8 @@ let currencyInput;
 let currencyValue;
 let currencyName;
 
-var earthquakeLayer = L.layerGroup();
+
+
 let wiki_marker;
 var myIcon = L.icon({
     iconUrl: 'images/wiki.png',
@@ -93,11 +97,21 @@ function initMap() {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
     });
+
+    earthquakeCluster = L.markerClusterGroup({
+        polygonOptions: {
+            fillColor: 'yellow',
+            color: '#FFA700',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.5
+        }
+    }).addTo(map);
     var overlayMap = {
-        //'EarthQuake': earthquakeLayer,
+        'EarthQuake': earthquakeCluster,
+
     }
     var baseMaps = {
-
         "Satalite": satalite,
         "Street": openStreetMap,
     };
@@ -147,7 +161,7 @@ $(document).ready(function () {
 
 $('#iso-country').change(function () {
     var countryCode = $(this).val();
-
+    // Show PolyGone of each Country Selected
     $.ajax({
         url: 'PhP/polygone.php',
         dataType: 'json',
@@ -170,6 +184,19 @@ $('#iso-country').change(function () {
         }
     });
 
+    // Show County Flag
+    $.ajax({
+        url: 'PhP/countryFlag.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            isoCode: countryCode
+        },
+        success: function (flag_result) {
+            // console.log(flag_result);
+            $('#flag').attr('src', flag_result.data);
+        }
+    });
 
     //function to get north, east, west and south of a country
     $.ajax({
@@ -197,7 +224,7 @@ $('#iso-country').change(function () {
                 $("#name").html(cou_name);
                 $("#txtcapital").html(cou_capital);
                 $("#txtpopulation").html(cou_populatin.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-                $("#txtarea").html(cou_area + " km<sup>2</sup>");
+                $("#txtarea").html(cou_area.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " km<sup>2</sup>");
                 $("#txtlanguage").html(cou_language);
                 $("#txtcode").html(cou_code);
                 $("#txtcontinent").html(cou_continent);
@@ -325,8 +352,38 @@ $('#iso-country').change(function () {
                 }
             });
 
+            // Country Current Weather
 
-
+            $.ajax({
+                url: 'PhP/current_weather.php',
+                dataType: 'json',
+                type: 'POST',
+                data: {
+                    country: cou_name,
+                },
+                success: function (cou_weather_result) {
+                    //console.log(cou_weather_result);
+                    $('#weatherCountry').empty();
+                    $('#weatherCountry').html(cou_name);
+                    let current_temp = cou_weather_result.data.main['temp'];
+                    let temp_feel = cou_weather_result.data.main['feels_like'];
+                    let description = cou_weather_result.data.weather[0]['description'];
+                    let icon = cou_weather_result.data.weather[0]['icon'];
+                    let sunRise = cou_weather_result.data.sys['sunrise'];
+                    let sunSet = cou_weather_result.data.sys['sunset'];
+                    const sunRiseTime = new Date(sunRise * 1000).toLocaleTimeString();
+                    const sunSetTime = new Date(sunSet * 1000).toLocaleTimeString();
+                    let celsius_temp = (current_temp - 273.15).toFixed(0);
+                    let celsius_feel = (temp_feel - 273.15).toFixed(0);
+                    $('#nowWeatherImg').attr('src', "http://openweathermap.org/img/wn/" + icon + "@4x.png");
+                    $('#nowWeatherDescription').html(description);
+                    $('#noewTemp').html('Temperature: ' + celsius_temp + "°C");
+                    $('#feelTemp').html('Feels Like: ' + celsius_feel + "°C");
+                    $('#sunRise').html('Sun Rise: ' + sunRiseTime);
+                    $('#sunSet').html('Sun Set: ' + sunSetTime);
+                }
+            });
+            //News
             $.ajax({
                 url: 'PhP/countryNews.php',
                 dataType: 'json',
@@ -379,45 +436,6 @@ $('#iso-country').change(function () {
 
             });
 
-
-            // Country Current Weather
-            $.ajax({
-                url: 'PhP/current_weather.php',
-                dataType: 'json',
-                type: 'POST',
-                data: {
-                    country: cou_name,
-                },
-                success: function (cou_weather_result) {
-                    //console.log(cou_weather_result);
-                    $('#weatherCountry').empty();
-                    $('#weatherCountry').html(cou_name);
-                    let current_temp = cou_weather_result.data.main['temp'];
-                    let temp_feel = cou_weather_result.data.main['feels_like'];
-                    let description = cou_weather_result.data.weather[0]['description'];
-                    let icon = cou_weather_result.data.weather[0]['icon'];
-                    let sunRise = cou_weather_result.data.sys['sunrise'];
-                    let sunSet = cou_weather_result.data.sys['sunset'];
-                    const sunRiseTime = new Date(sunRise * 1000).toLocaleTimeString();
-                    const sunSetTime = new Date(sunSet * 1000).toLocaleTimeString();
-                    // console.log(sunriseTime);
-                    //  console.log(temp_feel);
-                    // console.log(description);
-                    // console.log(icon);
-                    // console.log(sunRise);
-                    // console.log(sunSet);
-                    let celsius_temp = (current_temp - 273.15).toFixed(0);
-                    let celsius_feel = (temp_feel - 273.15).toFixed(0);
-                    $('#nowWeatherImg').attr('src', "http://openweathermap.org/img/wn/" + icon + "@4x.png");
-                    $('#nowWeatherDescription').html(description);
-                    $('#noewTemp').html('Temperature: ' + celsius_temp + "°C");
-                    $('#feelTemp').html('Feels Like: ' + celsius_feel + "°C");
-                    $('#sunRise').html('Sun Rise: ' + sunRiseTime);
-                    $('#sunSet').html('Sun Set: ' + sunSetTime);
-                }
-            });
-
-
             //country Wikipedia
             $.ajax({
                 url: 'PhP/wikipedia.php',
@@ -437,7 +455,7 @@ $('#iso-country').change(function () {
                     $('#wikipediaSummary').html(cou_wikiSummary);
                     //  $(wikipediaThumbnail).attr('src', cou_image);
                     $('#wikipedialink').attr('href', `https://${cou_wikiUrl.trim()}`);
-                    $('#wikipedialink').html(`https://${cou_wikiUrl.trim()}`);
+                    $('#wikipedialink').html(`Read More...`);
 
 
                 },
@@ -475,7 +493,7 @@ $('#iso-country').change(function () {
                         }
 
                         let numberVal = document.querySelector('#number');
-                        numberVal.value = '';
+                        numberVal.value = '1';
                         let currencyCodeList = document.querySelector('#currencyCodeList');
                         let finalCurrency;
 
@@ -506,54 +524,52 @@ $('#iso-country').change(function () {
 
             });
 
+            //Flag 
+
         }
     });
-    $.ajax({
-        url: 'PhP/countryFlag.php',
-        type: 'POST',
-        dataType: 'json',
-        data: {
-            isoCode: countryCode
-        },
-        success: function (flag_result) {
-            //  console.log(flag_result);
-            $('#flag').attr('src', flag_result.data);
-        }
-    });
+
 
 
 });
 
-
-
-
-
-
 function easyButtonMap() {
 
     // sample bootstap modal 
-    L.easyButton('<img src="images/info1.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+    L.easyButton('fa-info fa-lg', function (btn, map) {
         $("#infoModal").modal('show');
 
     }).addTo(map);
 
-    L.easyButton('<img src="images/city.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
-        $("#cityModal").modal('show');
 
+    L.easyButton({
+        states: [{
+            stateName: 'city-modal',
+            icon: '<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/city.png" style="max-width: 150%; max-height: 150%;"></div>',
+            title: 'City Modal',
+            onClick: function (btn, map) {
+                $("#cityModal").modal('show');
+            }
+        }]
     }).addTo(map);
-    L.easyButton('<img src="images/cloudy.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+
+
+
+    //as ke by default css  kha ha 
+
+    L.easyButton('<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/cloudy.png" style="max-width: 150%; max-height: 150%;"></div>', function (btn, map) {
         $("#weatherMOdal").modal('show');
 
     }).addTo(map);
-    L.easyButton('<img src="images/news.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+    L.easyButton('<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/news.png" style="max-width: 150%; max-height: 150%;"></div>', function (btn, map) {
         $("#newsModal").modal('show');
 
     }).addTo(map);
-    L.easyButton('<img src="images/wikipedia.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+    L.easyButton('<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/wikipedia.png" style="max-width: 150%; max-height: 150%;"></div>', function (btn, map) {
         $("#countrywikipediaModal").modal('show');
 
     }).addTo(map);
-    L.easyButton('<img src="images/money.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {
+    L.easyButton('<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/money.png" style="max-width: 150%; max-height: 150%;"></div>', function (btn, map) {
         $("#currencyModal").modal('show');
 
     }).addTo(map);
@@ -579,9 +595,9 @@ function earthQukae() {
         },
         success: function (earth_result) {
             // console.log(earth_result);
-            earth_markers = L.markerClusterGroup();
+            // earth_markers = L.markerClusterGroup();
             //  earth_markers.clearLayers();
-            earthquakeLayer.clearLayers();
+            earthquakeCluster.clearLayers();
             for (j = 0; j < earth_result.data.length; j++) {
                 (function (j) {
                     earth_lat = earth_result.data[j].lat;
@@ -608,7 +624,7 @@ function earthQukae() {
                                 if (typeof eqCityName_result !== 'undefined' && eqCityName_result.data !== null) {
                                     eqCity = eqCityName_result.data[0].name;
                                     // console.log(eqCity)
-                                    earthquakeLayer.addLayer(L.marker([earth_result.data[j].lat, earth_result.data[j].lng], { icon: earthMarker }).bindPopup(
+                                    L.marker([earth_result.data[j].lat, earth_result.data[j].lng], { icon: earthMarker }).bindPopup(
                                         '<h5 style="font-weight: bold;">' + eqCity + '</h5>' +
                                         '<div class="container"><table class="table">' +
                                         //'<thead><th style="background: none;">' + eqCity + '</th></thead>' +
@@ -617,7 +633,7 @@ function earthQukae() {
                                         '<tr><td>Magnitude: </td><td>' + earth_magnitude + '</td></tr>' +
                                         '<tr><td> Depth: </td><td>' + eartg_deapth + '</td></tr></table></div>'
 
-                                    ));
+                                    ).addTo(earthquakeCluster);
                                     // earthquakeLayer.addLayer(earth_markers);
 
                                 } else {
@@ -635,7 +651,7 @@ function earthQukae() {
                 })(j);
 
             }
-            map.addLayer(earthquakeLayer);
+            //  map.addLayer(earthquakeLayer);
         }
     });
 
