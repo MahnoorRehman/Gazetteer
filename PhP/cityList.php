@@ -10,7 +10,7 @@ error_reporting(E_ERROR | E_PARSE);
 
 //$url="http://api.geonames.org/citiesJSON?north=". $_REQUEST['north'] ."&south=". $_REQUEST['south'] ."&east=".$_REQUEST['east']."&west=". $_REQUEST['west'] ."&lang=de&username=drawinghub6";
 
-$url="http://api.geonames.org/searchJSON?country=".$_REQUEST['countrycode']."&featureClass=P&maxRows=15&username=drawinghub6";
+$url="http://api.geonames.org/searchJSON?country=".$_REQUEST['countrycode']."&featureClass=P&maxRows=30&username=drawinghub6";
 $ch=curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

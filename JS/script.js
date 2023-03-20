@@ -61,12 +61,15 @@ let currencyName;
 
 
 
-let wiki_marker;
-var myIcon = L.icon({
-    iconUrl: 'images/wiki.png',
-    iconSize: [30, 38],
-    iconAnchor: [22, 94],
-    popupAnchor: [-3, -76],
+
+var myIcon = L.ExtraMarkers.icon({
+    icon: 'fa-wikipedia-w',
+    iconColor: 'Black',
+    markerColor: 'white',
+    backgroundColor: 'white',
+    shape: 'square',
+    prefix: 'fa',
+
 });
 var earthMarker = L.icon({
     iconUrl: 'images/crack.png',
@@ -75,11 +78,12 @@ var earthMarker = L.icon({
     popupAnchor: [-3, -76],
 });
 let weather_markers;
-var weatherMarker = L.icon({
-    iconUrl: 'images/cloudy.png',
-    iconSize: [30, 38],
-    iconAnchor: [22, 94],
-    popupAnchor: [-3, -76],
+var weatherMarker = L.ExtraMarkers.icon({
+    icon: 'fa-sun',
+    iconColor: '#FDB813',
+    markerColor: 'white',
+    shape: 'square',
+    prefix: 'fa'
 });
 
 // Initialize the Leaflet map
@@ -247,15 +251,36 @@ $('#iso-country').change(function () {
                     // console.log(city_result);
                     let json_city = JSON.stringify(city_result);
                     const city_data = JSON.parse(json_city);
+                    let wiki_marker;
                     if (wiki_marker) {
                         map.removeLayer(wiki_marker);
                     }
-                    wiki_marker = L.markerClusterGroup();
+                    wiki_marker = L.markerClusterGroup(
+                        {
+                            polygonOptions: {
+                                fillColor: 'yellow',
+                                color: '#FFA700',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.5
+                            }
+                        }
+                    ).addTo(map);
                     wiki_marker.clearLayers();
                     if (weather_markers) {
                         map.removeLayer(weather_markers);
                     }
-                    weather_markers = L.markerClusterGroup();
+                    weather_markers = L.markerClusterGroup(
+                        {
+                            polygonOptions: {
+                                fillColor: 'yellow',
+                                color: '#FFA700',
+                                weight: 2,
+                                opacity: 1,
+                                fillOpacity: 0.5
+                            }
+                        }
+                    );
                     weather_markers.clearLayers();
                     $('#city-table').empty();
                     for (i = 0; i < city_result.data.length; i++) {
@@ -283,7 +308,7 @@ $('#iso-country').change(function () {
                                         wiki_url = wiki_result.data[0].wikipediaUrl;
 
 
-                                        wiki_marker.addLayer(L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
+                                        L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
                                             '<h2>' + city_name + '</h2>' +
                                             //'<img src="' + wiki_thumbnail + '">' +
                                             '<p>' + wiki_summary + '</p>' +
@@ -291,7 +316,7 @@ $('#iso-country').change(function () {
 
                                             `<a   style="color: white;" target="_blank" href="https://${wiki_url.trim()}">Read More</a>`,
                                             { className: popupClassName }
-                                        ));
+                                        ).addTo(wiki_marker);
                                     }
                                 });
 
@@ -305,7 +330,7 @@ $('#iso-country').change(function () {
                                         longitude: city_lng
                                     },
                                     success: function (weather_result) {
-                                        //console.log(weather_result);
+                                        console.log(weather_result);
                                         if (typeof weather_result.data !== 'undefined' && weather_result.data !== null) {
                                             var weather_lat = weather_result.data.lat;
                                             var weather_lng = weather_result.data.lng;
@@ -314,7 +339,7 @@ $('#iso-country').change(function () {
                                             var weather_wind = weather_result.data.windSpeed;
                                             weather_city = weather_result.data.stationName;
 
-                                            weather_markers.addLayer(L.marker([weather_lat, weather_lng], { icon: weatherMarker }).bindPopup(
+                                            weather_markers.addLayer(L.marker([city_lat, city_lng], { icon: weatherMarker }).bindPopup(
                                                 '<h2>' + city_name + '</h2>' +
                                                 '<div class="container"><table class="table table-striped">' +
                                                 "<tbody><tr><td> Clouds: </td><td>" +
@@ -344,7 +369,7 @@ $('#iso-country').change(function () {
                             }
                         })(i);
                     }
-                    map.addLayer(wiki_marker);
+                    //  map.addLayer(wiki_marker);
                     map.addLayer(weather_markers);
                 },
                 error: function (xhr, status, error) {
@@ -536,7 +561,7 @@ $('#iso-country').change(function () {
 function easyButtonMap() {
 
     // sample bootstap modal 
-    L.easyButton('fa-info fa-lg', function (btn, map) {
+    L.easyButton('<div style="display: inline-flex; justify-content: center; align-items: center;"><img src="images/info1.png" style="max-width: 150%; max-height: 150%;"></div>', function (btn, map) {
         $("#infoModal").modal('show');
 
     }).addTo(map);

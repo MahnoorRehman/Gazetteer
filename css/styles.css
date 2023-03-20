@@ -130,3 +130,8 @@ body {
 tr:nth-child(odd) {
     background-color: #afddef;
 }
+
+
+.fa-wikiIcon {
+    font-weight: bold;
+}
