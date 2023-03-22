@@ -23,9 +23,7 @@ let city_lat;
 let city_lng;
 let wikipedia;
 let city_name;
-let wiki_summary;
-let wiki_thumbnail;
-let wiki_url;
+
 // countrty Info
 let cou_populatin;
 let cou_capital;
@@ -113,7 +111,6 @@ function initMap() {
     }).addTo(map);
     var overlayMap = {
         'EarthQuake': earthquakeCluster,
-
     }
     var baseMaps = {
         "Satalite": satalite,
@@ -126,6 +123,7 @@ function initMap() {
 // Call initMap on document ready
 $(document).ready(function () {
     initMap();
+    //Current Location of a user 
     if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function (position) {
             var lat = position.coords.latitude;
@@ -188,7 +186,7 @@ $('#iso-country').change(function () {
         }
     });
 
-    // Show County Flag
+    // Show Country Flag
     $.ajax({
         url: 'PhP/countryFlag.php',
         type: 'POST',
@@ -236,7 +234,8 @@ $('#iso-country').change(function () {
             } else {
                 console.error('Error: Unable to get EWNS data');
             };
-            //Ajax for EarthQuakes
+
+            //Function for EarthQuakes
             earthQukae();
 
             //city List
@@ -251,22 +250,7 @@ $('#iso-country').change(function () {
                     // console.log(city_result);
                     let json_city = JSON.stringify(city_result);
                     const city_data = JSON.parse(json_city);
-                    let wiki_marker;
-                    if (wiki_marker) {
-                        map.removeLayer(wiki_marker);
-                    }
-                    wiki_marker = L.markerClusterGroup(
-                        {
-                            polygonOptions: {
-                                fillColor: 'yellow',
-                                color: '#FFA700',
-                                weight: 2,
-                                opacity: 1,
-                                fillOpacity: 0.5
-                            }
-                        }
-                    ).addTo(map);
-                    wiki_marker.clearLayers();
+
                     if (weather_markers) {
                         map.removeLayer(weather_markers);
                     }
@@ -291,34 +275,10 @@ $('#iso-country').change(function () {
                             var city_population = city_result.data[i].population;
                             $("#county-name").html(cou_name + `'s Most Populated Cities`);
                             $('#city-table').append("<tr><td>" + city_name + "</td><td>" + city_population.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "</td></tr>");
-
+                            //  console.log(city_name)
+                            //   console.log(city_lng)
                             try {
-                                $.ajax({
-                                    url: 'PhP/wikipedia.php',
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: {
-                                        city: city_name,
-                                    },
-                                    success: function (wiki_result) {
-                                        // console.log(wiki_result);
-
-                                        //  if (typeof wiki_result.data[i] !== 'undefined' && wiki_result.data[i] !== null) {
-                                        wiki_summary = wiki_result.data[0].summary;
-                                        wiki_url = wiki_result.data[0].wikipediaUrl;
-
-
-                                        L.marker([city_lat, city_lng], { icon: myIcon }).bindPopup(
-                                            '<h2>' + city_name + '</h2>' +
-                                            //'<img src="' + wiki_thumbnail + '">' +
-                                            '<p>' + wiki_summary + '</p>' +
-                                            //'<button onclick="window.location.href=' + wiki_url + '">Click me to go to the Wikipedia page for Kabul</button>' +
-
-                                            `<a   style="color: white;" target="_blank" href="https://${wiki_url.trim()}">Read More</a>`,
-                                            { className: popupClassName }
-                                        ).addTo(wiki_marker);
-                                    }
-                                });
+                                //City Wiki Pedia
 
                                 //CITY Weather AjAX
                                 $.ajax({
@@ -330,7 +290,7 @@ $('#iso-country').change(function () {
                                         longitude: city_lng
                                     },
                                     success: function (weather_result) {
-                                        console.log(weather_result);
+                                        // console.log(weather_result);
                                         if (typeof weather_result.data !== 'undefined' && weather_result.data !== null) {
                                             var weather_lat = weather_result.data.lat;
                                             var weather_lng = weather_result.data.lng;
@@ -339,7 +299,7 @@ $('#iso-country').change(function () {
                                             var weather_wind = weather_result.data.windSpeed;
                                             weather_city = weather_result.data.stationName;
 
-                                            weather_markers.addLayer(L.marker([city_lat, city_lng], { icon: weatherMarker }).bindPopup(
+                                            weather_markers.addLayer(L.marker([weather_lat, weather_lng], { icon: weatherMarker }).bindPopup(
                                                 '<h2>' + city_name + '</h2>' +
                                                 '<div class="container"><table class="table table-striped">' +
                                                 "<tbody><tr><td> Clouds: </td><td>" +
@@ -377,8 +337,55 @@ $('#iso-country').change(function () {
                 }
             });
 
-            // Country Current Weather
 
+            //Show City WikiPedia Markers
+            let wiki_marker;
+            if (wiki_marker) {
+                map.removeLayer(wiki_marker);
+            }
+            wiki_marker = L.markerClusterGroup(
+                {
+                    polygonOptions: {
+                        fillColor: 'yellow',
+                        color: '#FFA700',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.5
+                    }
+                }
+            ).addTo(map);
+            wiki_marker.clearLayers();
+            $.ajax({
+                url: 'PhP/cityWiki.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    north: north_value,
+                    south: south_value,
+                    east: east_value,
+                    west: west_value
+                },
+                success: function (wiki_result) {
+                    //  console.log(wiki_result);
+                    for (let w = 0; w < wiki_result.data.length; w++) {
+                        let wiki_summary = wiki_result.data[w].summary;
+                        let wiki_url = wiki_result.data[w].wikipediaUrl;
+                        let wiki_title = wiki_result.data[w].title;
+                        let wiki_lat = wiki_result.data[w].lat;
+                        let wiki_lng = wiki_result.data[w].lng;
+
+
+                        L.marker([wiki_lat, wiki_lng], { icon: myIcon }).bindPopup(
+                            '<h2>' + wiki_title + '</h2>' +
+                            '<p>' + wiki_summary + '</p>' +
+                            `<a   style="color: white;" target="_blank" href="https://${wiki_url.trim()}">Read More</a>`,
+                            { className: popupClassName }
+                        ).addTo(wiki_marker);
+                    }
+                }
+            });
+
+            // Country Current Weather
             $.ajax({
                 url: 'PhP/current_weather.php',
                 dataType: 'json',
@@ -408,7 +415,7 @@ $('#iso-country').change(function () {
                     $('#sunSet').html('Sun Set: ' + sunSetTime);
                 }
             });
-            //News
+            //Country News
             $.ajax({
                 url: 'PhP/countryNews.php',
                 dataType: 'json',
@@ -462,6 +469,7 @@ $('#iso-country').change(function () {
             });
 
             //country Wikipedia
+            // console.log(cou_name);
             $.ajax({
                 url: 'PhP/wikipedia.php',
                 dataType: 'json',
@@ -470,7 +478,7 @@ $('#iso-country').change(function () {
                     city: cou_name,
                 },
                 success: function (cou_wikipedia) {
-                    //  console.log(cou_wikipedia);
+                    //   console.log(cou_wikipedia);
                     $('#wikiCountryName').empty();
                     $('#wikipediaSummary').empty();
                     let cou_wikiSummary = cou_wikipedia.data[0].summary;
@@ -489,7 +497,7 @@ $('#iso-country').change(function () {
                 }
             });
 
-            // Curreny
+            // Curreny of a Country
 
             $.ajax({
                 url: 'PhP/currency.php',
@@ -549,15 +557,15 @@ $('#iso-country').change(function () {
 
             });
 
-            //Flag 
+
 
         }
     });
 
-
-
 });
 
+
+//Funtion for Leaflet Map Buttons
 function easyButtonMap() {
 
     // sample bootstap modal 
@@ -602,7 +610,7 @@ function easyButtonMap() {
 }
 
 
-
+// Function fro EaRTHQUAKE Markers 
 function earthQukae() {
     //  if (!earthquake_button_added) {
     //    L.easyButton('<img src="images/crack.png" style="width: 25px; height:25px; display: block; margin: auto;">', function (btn, map) {

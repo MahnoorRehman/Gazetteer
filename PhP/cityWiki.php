@@ -6,9 +6,9 @@ $city = urlencode($_REQUEST['city']);
 //$city=$_REQUEST['city'];
 
 //$url='http://api.geonames.org/wikipediaSearchJSON?q=quetta&maxRows=10&username=drawinghub6';
-$url="http://api.geonames.org/wikipediaSearchJSON?q=$city&maxRows=50&username=drawinghub6";
-
-//$url="http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=". $_REQUEST['north'] ."&south=". $_REQUEST['south'] ."&east=".$_REQUEST['east']."&west=". $_REQUEST['west'] ."&username=drawinghub6&style=full";
+//$url="http://api.geonames.org/wikipediaSearchJSON?q=$city&maxRows=30&username=drawinghub6";
+//$url="http://api.geonames.org/findNearbyWikipediaJSON?lat=".$_REQUEST['lat']."&lng=".$_REQUEST['lng']."&username=drawinghub6";
+$url="http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=". $_REQUEST['north'] ."&south=". $_REQUEST['south'] ."&east=".$_REQUEST['east']."&west=". $_REQUEST['west'] ."&maxRows=30&username=drawinghub6&style=full";
 $ch=curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
